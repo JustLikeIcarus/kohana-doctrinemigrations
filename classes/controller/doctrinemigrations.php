@@ -19,14 +19,7 @@ class Controller_DoctrineMigrations extends Controller {
 	{
 		parent::before();
 		
-		$connection = Doctrine_Manager::connection
-		(
-			Kohana::config('database.default.type').'://'.
-			Kohana::config('database.default.connection.username').':'.
-			Kohana::config('database.default.connection.password').'@'.
-			Kohana::config('database.default.connection.hostname').'/'.
-			Kohana::config('database.default.connection.database')
-		);
+		
 	}
 
 	/**
