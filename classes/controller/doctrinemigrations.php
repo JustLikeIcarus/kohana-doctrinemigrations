@@ -18,7 +18,7 @@ class Controller_DoctrineMigrations extends Controller {
 	public function before()
 	{
 		parent::before();
-		
+		print Kohana::find_file('vendor', 'doctrine/lib/Doctrine');
 		require Kohana::find_file('vendor', 'doctrine/lib/Doctrine');
         spl_autoload_register(array('Doctrine', 'autoload'));
         
