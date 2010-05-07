@@ -1,6 +1,6 @@
 # Doctrine Migrations
 
-*Doctrine Migrations module from Kohana 3.x*
+*Doctrine Migrations module for Kohana 3.x*
 
 - **Module Versions:** 0.8
 - **Module URL:** <http://github.com/synapsestudios/kohana-doctrinemigrations>
