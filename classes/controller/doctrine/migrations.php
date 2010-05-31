@@ -1,13 +1,13 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * The DoctrineMigrations Controller allows the user to run the database
+ * The Doctrine_Migrations Controller allows the user to run the database
  * migrations, either up or down, using the default database connection.
  *
  * @package    DoctrineMigrations
  * @author     Synapse Studios
  * @copyright  Copyright (c) 2009 Synapse Studios
  */
-class Controller_DoctrineMigrations extends Controller {
+class Controller_Doctrine_Migrations extends Controller {
 
 	/**
 	 * Enables Doctrine and establishes a database connection to the default
@@ -35,20 +35,14 @@ class Controller_DoctrineMigrations extends Controller {
 	/**
 	 * Runs the migration to the specified version or to the latest version if
 	 * none is provided.
-	 *
-	 * @param   integer  migration version
 	 */
-	public function action_index($version = NULL)
+	public function action_index()
 	{
 		$migration = new Doctrine_Migration(APPPATH.'migrations');
 		$current_version = $migration->getCurrentVersion();
 		$latest_version = $migration->getLatestVersion();
 
-		// If the provided version is not an integer then use the latest version
-		if ( ! ctype_digit($version))
-		{
-			$version = $latest_version;
-		}
+		$version = (int)$this->request->param('version', $latest_version);
 
 		// If the provided version is higher than the latest version, do nothing
 		if ($version > $latest_version)
