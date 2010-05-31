@@ -18,7 +18,10 @@ class Controller_DoctrineMigrations extends Controller {
 	public function before()
 	{
 		parent::before();
-		
+
+		require Kohana::find_file('vendor', 'doctrine/lib/Doctrine');
+		spl_autoload_register(array('Doctrine', 'autoload'));
+
 		$connection = Doctrine_Manager::connection
 		(
 			Kohana::config('database.default.type').'://'.
