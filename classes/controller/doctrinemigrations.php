@@ -65,4 +65,14 @@ class Controller_DoctrineMigrations extends Controller {
 				#'.$current_version.' and now is #'.$version);
 		}
 	}
+
+	/**
+	 * Returns the current migration version
+	 *
+	 */
+	public function action_current()
+	{
+		$migration = new Doctrine_Migration(APPPATH.'migrations');
+		echo $migration->getCurrentVersion();
+	}
 }
