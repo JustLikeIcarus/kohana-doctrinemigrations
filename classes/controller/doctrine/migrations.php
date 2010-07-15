@@ -23,14 +23,14 @@ class Controller_Doctrine_Migrations extends Controller {
 		spl_autoload_register(array('Doctrine', 'autoload'));
 
 		$config = Kohana::config('database.default');
-
+		
 		$connection = Doctrine_Manager::connection
 		(
-			$config->type.'://'.
-			$config->connection->username.':'.
-			$config->connection->password.'@'.
-			$config->connection->hostname.'/'.
-			$config->connection->database
+			$config['type'].'://'.
+			$config['connection']['username'].':'.
+			$config['connection']['password'].'@'.
+			$config['connection']['hostname'].'/'.
+			$config['connection']['database']
 		);
 	}
 
@@ -64,7 +64,6 @@ class Controller_Doctrine_Migrations extends Controller {
 				#'.$current_version.' and now is #'.$version);
 		}
 	}
-}
 
 	/**
 	 * Returns the current migration version
