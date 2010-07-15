@@ -5,25 +5,39 @@
  *
  * @package    DoctrineMigrations
  * @author     Synapse Studios
+ * @author     Mathew Davies <thepixeldeveloper@googlemail.com>
  * @copyright  Copyright (c) 2009 Synapse Studios
  */
-class Controller_Doctrine_Migrations extends Controller {
-
+class Controller_Doctrine_Migrations extends Controller
+{
+	/**
+	 * @var Doctrine_Migration
+	 */
+	protected $_migration = NULL;
+	
 	/**
 	 * Enables Doctrine and establishes a database connection to the default
 	 * database as specified in the database config.
 	 *
-	 * @param   integer  migration version
+	 * @param Kohana_Request $request
 	 */
-	public function before()
+	public function  __construct(Kohana_Request $request)
 	{
-		parent::before();
-
+		if ( ! extension_loaded('pdo'))
+		{
+			throw new Kohana_Exception('PDO needs to be installed with MySQL support');
+		}
+		
 		require Kohana::find_file('vendor', 'doctrine/lib/Doctrine');
 		spl_autoload_register(array('Doctrine', 'autoload'));
 
-		$config = Kohana::config('database.default');
-		
+		// Which DB group we're going to use?
+		$group = Kohana::config('migrations.group');
+
+		// Load database settings
+		$config = Kohana::config('database.'.$group);
+
+		// Build DSN string.
 		$connection = Doctrine_Manager::connection
 		(
 			$config['type'].'://'.
@@ -32,6 +46,10 @@ class Controller_Doctrine_Migrations extends Controller {
 			$config['connection']['hostname'].'/'.
 			$config['connection']['database']
 		);
+
+		$this->_migration = new Doctrine_Migration(APPPATH.'migrations');
+
+		parent::__construct($request);
 	}
 
 	/**
@@ -40,38 +58,35 @@ class Controller_Doctrine_Migrations extends Controller {
 	 */
 	public function action_index()
 	{
-		$migration = new Doctrine_Migration(APPPATH.'migrations');
-		$current_version = $migration->getCurrentVersion();
-		$latest_version = $migration->getLatestVersion();
+		$current = $this->_migration->getCurrentVersion();
 
-		$version = (int)$this->request->param('version', $latest_version);
+		// If no version was specified, find the latest version.
+		$version = (int) $this->request->param('version', $this->_migration->getLatestVersion());
 
-		// If the provided version is higher than the latest version, do nothing
-		if ($version > $latest_version)
+		try
 		{
-			echo __('Unable to find migration classes.  No action performed.');
+			$this->_migration->migrate($version);
+			
+			echo __('Database migration is complete. Database version was	#:current and now is #:version',
+				array(':current' => $current, ':version' => $version)).PHP_EOL;
+			
+			exit (0);
 		}
-		// If the provided version is equal to the current version, do nothing
-		elseif ($version == $current_version)
+		catch(Doctrine_Exception $e)
 		{
-			echo __('Database is already up to date.  No action necessary');
-		}
-		// Perform the migration to the provided version
-		else
-		{
-			$migration->migrate($version);
-			echo __('Database migration is complete. Database version was
-				#'.$current_version.' and now is #'.$version);
+			Kohana::$log->add(Kohana::ERROR, Kohana::exception_text($e));
+
+			echo __('Database migration failed, check the Kohana log.').PHP_EOL;
+
+			exit(1);
 		}
 	}
 
 	/**
 	 * Returns the current migration version
-	 *
 	 */
 	public function action_current()
 	{
-		$migration = new Doctrine_Migration(APPPATH.'migrations');
-		echo $migration->getCurrentVersion();
+		echo $this->_migration->getCurrentVersion().PHP_EOL;
 	}
 }
