@@ -1,6 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-    require Kohana::find_file('vendor', 'doctrine/lib/Doctrine');
-    spl_autoload_register(array('Doctrine', 'autoload'));
-    
-    
+Route::set('doctrine', 'migrate(/<version>)', array('version' => '\d+'))
+	->defaults(array(
+		'controller' => 'migrations',
+		'directory'  => 'doctrine',
+	));
+
+Route::set('doctrine/current', 'migrate/current')
+	->defaults(array(
+		'controller' => 'migrations',
+		'action'     => 'current',
+		'directory'  => 'doctrine',
+	));
